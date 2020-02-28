@@ -42,6 +42,14 @@ IF NOT EXISTS (SELECT * FROM LookupItem WHERE Name = 'AT2X4')
 IF NOT EXISTS (SELECT * FROM LookupItem WHERE Name = 'AT2X5')
 	INSERT INTO LookupItem (Name, DisplayName, DeleteFlag) VALUES ('AT2X5', 'ABC + 3TC + DRV + RTV + RAL', 21)
 	
+IF NOT EXISTS (SELECT * FROM LookupItem WHERE Name = 'AT2X6')
+	INSERT INTO LookupItem (Name, DisplayName, DeleteFlag) VALUES ('AT2X6', 'TDF + 3TC + DTG + DRV + RTV/r', 22)
+
+IF NOT EXISTS (SELECT * FROM LookupItem WHERE Name = 'AT2X7')
+	INSERT INTO LookupItem (Name, DisplayName, DeleteFlag) VALUES ('AT2X7', 'TDF + DTG + FTC + DRV + RTV/r', 23)
+
+IF NOT EXISTS (SELECT * FROM LookupItem WHERE Name = 'AT2X8')
+	INSERT INTO LookupItem (Name, DisplayName, DeleteFlag) VALUES ('AT2X8', 'TDF + 3TC + ATV/r', 24)
 
 IF NOT EXISTS (SELECT * FROM LookupMasterItem WHERE LookupMasterId = @AdultThirdlineRegimen AND LookupItemId = (SELECT top 1 Id FROM LookupItem WHERE Name = 'AT2A'))
 	INSERT INTO LookupMasterItem (LookupMasterId,LookupItemId,DisplayName,OrdRank) VALUES (@AdultThirdlineRegimen,(SELECT top 1 Id FROM LookupItem WHERE Name = 'AT2A'), 'ETV + 3TC + DRV + RTV', 13)
@@ -69,6 +77,16 @@ IF NOT EXISTS (SELECT * FROM LookupMasterItem WHERE LookupMasterId = @AdultThird
 
 IF NOT EXISTS (SELECT * FROM LookupMasterItem WHERE LookupMasterId = @AdultThirdlineRegimen AND LookupItemId = (SELECT top 1 Id FROM LookupItem WHERE Name = 'AT2X5'))
 	INSERT INTO LookupMasterItem (LookupMasterId,LookupItemId,DisplayName,OrdRank) VALUES (@AdultThirdlineRegimen,(SELECT top 1 Id FROM LookupItem WHERE Name = 'AT2X5'), (SELECT top 1 DisplayName FROM LookupItem WHERE Name = 'AT2X5'), 21)
+
+IF NOT EXISTS (SELECT * FROM LookupMasterItem WHERE LookupMasterId = @AdultThirdlineRegimen AND LookupItemId = (SELECT top 1 Id FROM LookupItem WHERE Name = 'AT2X6'))
+	INSERT INTO LookupMasterItem (LookupMasterId,LookupItemId,DisplayName,OrdRank) VALUES (@AdultThirdlineRegimen,(SELECT top 1 Id FROM LookupItem WHERE Name = 'AT2X6'), (SELECT top 1 DisplayName FROM LookupItem WHERE Name = 'AT2X6'), 22)
+
+IF NOT EXISTS (SELECT * FROM LookupMasterItem WHERE LookupMasterId = @AdultThirdlineRegimen AND LookupItemId = (SELECT top 1 Id FROM LookupItem WHERE Name = 'AT2X7'))
+	INSERT INTO LookupMasterItem (LookupMasterId,LookupItemId,DisplayName,OrdRank) VALUES (@AdultThirdlineRegimen,(SELECT top 1 Id FROM LookupItem WHERE Name = 'AT2X7'), (SELECT top 1 DisplayName FROM LookupItem WHERE Name = 'AT2X7'), 23)
+
+IF NOT EXISTS (SELECT * FROM LookupMasterItem WHERE LookupMasterId = @AdultThirdlineRegimen AND LookupItemId = (SELECT top 1 Id FROM LookupItem WHERE Name = 'AT2X8'))
+	INSERT INTO LookupMasterItem (LookupMasterId,LookupItemId,DisplayName,OrdRank) VALUES (@AdultThirdlineRegimen,(SELECT top 1 Id FROM LookupItem WHERE Name = 'AT2X8'), (SELECT top 1 DisplayName FROM LookupItem WHERE Name = 'AT2X8'), 24)
+
 
 DECLARE @PaedsThirdLineRegimen INT 
 SELECT @PaedsThirdLineRegimen = id from LookupMaster WHERE Name = 'PaedsThirdlineRegimen'
