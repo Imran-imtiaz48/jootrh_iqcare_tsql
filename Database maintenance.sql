@@ -1,48 +1,53 @@
---Incremental Statistics
+-- Incremental Statistics Update for User Databases
 EXECUTE dbo.IndexOptimize
-@Databases = 'USER_DATABASES',
-@UpdateStatistics = 'ALL',
-@OnlyModifiedStatistics = 'Y'
+    @Databases = 'USER_DATABASES',
+    @UpdateStatistics = 'ALL',
+    @OnlyModifiedStatistics = 'Y';
+GO
 
+-- Intelligent Index Maintenance for User Databases
+EXECUTE dbo.IndexOptimize
+    @Databases = 'USER_DATABASES',
+    @FragmentationLow = NULL,
+    @FragmentationMedium = 'INDEX_REORGANIZE,INDEX_REBUILD_ONLINE,INDEX_REBUILD_OFFLINE',
+    @FragmentationHigh = 'INDEX_REBUILD_ONLINE,INDEX_REBUILD_OFFLINE',
+    @FragmentationLevel1 = 5,  -- Reorganize for fragmentation >= 5%
+    @FragmentationLevel2 = 30; -- Rebuild for fragmentation >= 30%
+GO
 
---Intelligent Index Maintenance
-EXECUTE dbo.IndexOptimize @Databases = 'USER_DATABASES',
-@FragmentationLow = NULL,
-@FragmentationMedium = 'INDEX_REORGANIZE,INDEX_REBUILD_ONLINE,INDEX_REBUILD_OFFLINE',
-@FragmentationHigh = 'INDEX_REBUILD_ONLINE,INDEX_REBUILD_OFFLINE',
-@FragmentationLevel1 = 5,
-@FragmentationLevel2 = 30
+-- Full Statistics Update along with Index Maintenance
+EXECUTE dbo.IndexOptimize
+    @Databases = 'USER_DATABASES',
+    @FragmentationLow = NULL,
+    @FragmentationMedium = 'INDEX_REORGANIZE,INDEX_REBUILD_ONLINE,INDEX_REBUILD_OFFLINE',
+    @FragmentationHigh = 'INDEX_REBUILD_ONLINE,INDEX_REBUILD_OFFLINE',
+    @FragmentationLevel1 = 5,
+    @FragmentationLevel2 = 30,
+    @UpdateStatistics = 'ALL',
+    @OnlyModifiedStatistics = 'Y';
+GO
 
---Update Statistics
-EXECUTE dbo.IndexOptimize @Databases = 'USER_DATABASES',
-@FragmentationLow = NULL,
-@FragmentationMedium = 'INDEX_REORGANIZE,INDEX_REBUILD_ONLINE,INDEX_REBUILD_OFFLINE',
-@FragmentationHigh = 'INDEX_REBUILD_ONLINE,INDEX_REBUILD_OFFLINE',
-@FragmentationLevel1 = 5,
-@FragmentationLevel2 = 30,
-@UpdateStatistics = 'ALL',
-@OnlyModifiedStatistics = 'Y'
-
---Run Integrity Checks of Very Large Databases
+-- Database Integrity Checks for Very Large Databases (Physical Only)
 EXECUTE dbo.DatabaseIntegrityCheck
-@Databases = 'USER_DATABASES',
-@CheckCommands = 'CHECKDB',
-@PhysicalOnly = 'Y'
+    @Databases = 'USER_DATABASES',
+    @CheckCommands = 'CHECKDB',
+    @PhysicalOnly = 'Y';  -- Perform physical integrity check only
+GO
 
-
---SQL Server Smart Differential and Transaction Log Backup
---Here's how it can be used to perform a differential backup if less than 50% of the database has been modified, and a full backup if 50% or more of the database has been modified.
+-- Smart Differential Backup Based on Modification Level
 EXECUTE dbo.DatabaseBackup
-@Databases = 'USER_DATABASES',
-@Directory = 'D:\SQLServerHourBackups',
-@BackupType = 'DIFF',
-@ChangeBackupType = 'Y',
-@ModificationLevel = 50
+    @Databases = 'USER_DATABASES',
+    @Directory = 'D:\SQLServerHourBackups',
+    @BackupType = 'DIFF',           -- Perform differential backup
+    @ChangeBackupType = 'Y',        -- Change to full backup if modification level exceeds threshold
+    @ModificationLevel = 50;        -- Switch to full backup if 50% or more of the data has changed
+GO
 
---Here's how it can be used to perform a transaction log backup if 1 GB of log has been generated since the last log backup, or if it has not been backed up for 300 seconds. This enables you to do more frequent log backups of databases with high activity, and in periods of high activity.
+-- Smart Transaction Log Backup Based on Activity
 EXECUTE dbo.DatabaseBackup
-@Databases = 'USER_DATABASES',
-@Directory = 'D:\SQLServerHourBackups',
-@BackupType = 'LOG',
-@LogSizeSinceLastLogBackup = 1024,
-@TimeSinceLastLogBackup = 300
+    @Databases = 'USER_DATABASES',
+    @Directory = 'D:\SQLServerHourBackups',
+    @BackupType = 'LOG',                -- Perform transaction log backup
+    @LogSizeSinceLastLogBackup = 1024,  -- Backup if 1 GB of log has been generated
+    @TimeSinceLastLogBackup = 300;      -- Backup if 300 seconds have passed since last backup
+GO
